@@ -55,21 +55,21 @@ export interface LoginResponse {
   user: User;
 }
 
-export interface PaginatedResponse<T> {
+export interface PaginatedResponse {
   total: number;
   limit: number;
   offset: number;
 }
 
-export interface CustomersResponse extends PaginatedResponse<Customer> {
+export interface CustomersResponse extends PaginatedResponse {
   customers: Customer[];
 }
 
-export interface VehiclesResponse extends PaginatedResponse<Vehicle> {
+export interface VehiclesResponse extends PaginatedResponse {
   vehicles: Vehicle[];
 }
 
-export interface ServicesResponse extends PaginatedResponse<ServiceLog> {
+export interface ServicesResponse extends PaginatedResponse {
   services: ServiceLog[];
 }
 

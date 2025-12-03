@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors';
 import cron from 'node-cron';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import { config } from './config/env.js';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
 import { runReminderJob } from './services/reminderService.js';
@@ -14,8 +13,6 @@ import serviceRoutes from './routes/services.js';
 import lookupRoutes from './routes/lookup.js';
 import automationRoutes from './routes/automation.js';
 import customerPortalRoutes from './routes/customerPortal.js';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 
 // Middleware

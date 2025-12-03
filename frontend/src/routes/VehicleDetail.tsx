@@ -71,7 +71,6 @@ export function VehicleDetail() {
 
     // No service record - check against recommended mileage intervals
     const mileageSinceRecommended = vehicle.mileage % rec.recommended_mileage;
-    const nextDueMileage = vehicle.mileage + (rec.recommended_mileage - mileageSinceRecommended);
 
     if (mileageSinceRecommended > rec.recommended_mileage - 500) {
       return 'due-soon';

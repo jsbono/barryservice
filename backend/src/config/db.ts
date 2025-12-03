@@ -1,18 +1,16 @@
-import Database from 'better-sqlite3';
+import Database, { type Database as DatabaseType } from 'better-sqlite3';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import fs from 'fs';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const dbPath = path.join(__dirname, '..', '..', 'data', 'mechanic.db');
 
 // Ensure data directory exists
-import fs from 'fs';
 const dataDir = path.dirname(dbPath);
 if (!fs.existsSync(dataDir)) {
   fs.mkdirSync(dataDir, { recursive: true });
 }
 
-export const db = new Database(dbPath);
+export const db: DatabaseType = new Database(dbPath);
 db.pragma('journal_mode = WAL');
 
 // Convert PostgreSQL-style $1, $2 placeholders to SQLite ? placeholders
