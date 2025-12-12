@@ -18,10 +18,25 @@ export function ServiceRecommendationList({ services, vehicle }: Props) {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      <div className="bg-blue-600 text-white px-6 py-4">
-        <h3 className="text-lg font-semibold">
-          Recommended Services for {vehicle.year} {vehicle.make} {vehicle.model}
-        </h3>
+      {/* Artistic Car Image Banner */}
+      <div className="relative h-56 overflow-hidden">
+        <img
+          src={`https://source.unsplash.com/800x400/?${encodeURIComponent(vehicle.make + ' ' + vehicle.model + ' car')},automotive,classic`}
+          alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
+          className="w-full h-full object-cover"
+          style={{ filter: 'saturate(1.3) contrast(1.1)' }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://source.unsplash.com/800x400/?vintage+car+automotive';
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 via-blue-800/40 to-amber-900/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+        <div className="absolute bottom-0 left-0 right-0 p-6">
+          <h3 className="text-2xl font-bold text-white drop-shadow-lg">
+            {vehicle.year} {vehicle.make} {vehicle.model}
+          </h3>
+          <p className="text-white/80 text-sm mt-1">Recommended Service Schedule</p>
+        </div>
       </div>
       <div className="divide-y divide-gray-200">
         {services.map((service) => (
