@@ -18,16 +18,18 @@ export function ServiceRecommendationList({ services, vehicle }: Props) {
 
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
-      {/* Artistic Car Image Banner */}
+      {/* AI-Generated Artistic Car Image Banner */}
       <div className="relative h-56 overflow-hidden">
         <img
-          src={`https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=400&fit=crop&auto=format`}
+          src={`https://image.pollinations.ai/prompt/${encodeURIComponent(`${vehicle.year} ${vehicle.make} ${vehicle.model} car, artistic oil painting style, vintage aesthetic, dramatic lighting, rich colors, museum quality artwork`)}?width=800&height=400&nologo=true`}
           alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
           className="w-full h-full object-cover"
-          style={{ filter: 'saturate(1.3) contrast(1.1)' }}
+          style={{ filter: 'saturate(1.2) contrast(1.05)' }}
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=400&fit=crop&auto=format';
+          }}
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 via-blue-800/40 to-amber-900/50"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-6">
           <h3 className="text-2xl font-bold text-white drop-shadow-lg">
             {vehicle.year} {vehicle.make} {vehicle.model}

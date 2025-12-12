@@ -143,16 +143,19 @@ export function VehicleDetail() {
             </button>
           </div>
 
-          {/* Artistic Car Image Banner */}
+          {/* AI-Generated Artistic Car Image Banner */}
           <div className="relative mb-4 rounded-lg overflow-hidden h-48">
             <img
-              src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=300&fit=crop&auto=format"
+              src={`https://image.pollinations.ai/prompt/${encodeURIComponent(`${vehicle.year} ${vehicle.make} ${vehicle.model} car, artistic oil painting style, vintage aesthetic, dramatic lighting, rich colors, museum quality artwork`)}?width=800&height=300&nologo=true`}
               alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
               className="w-full h-full object-cover"
-              style={{ filter: 'saturate(1.2) contrast(1.1)' }}
+              style={{ filter: 'saturate(1.2) contrast(1.05)' }}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=300&fit=crop&auto=format';
+              }}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-blue-900/60 via-transparent to-amber-900/40"></div>
-            <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-4">
               <h4 className="text-white text-xl font-bold drop-shadow-lg">
                 {vehicle.year} {vehicle.make} {vehicle.model}
               </h4>
