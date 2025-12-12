@@ -147,12 +147,14 @@
 
   /* Spinner */
   .spinner {
-    @apply w-6 h-6 border-3 rounded-full animate-spin;
+    @apply w-6 h-6 rounded-full animate-spin;
+    border-width: 3px;
     border-color: var(--charley-200);
     border-top-color: var(--charley-600);
   }
   .spinner-lg {
-    @apply w-10 h-10 border-4;
+    @apply w-10 h-10;
+    border-width: 4px;
   }
 
   /* Section Header */
