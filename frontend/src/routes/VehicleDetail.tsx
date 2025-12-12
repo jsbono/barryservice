@@ -146,14 +146,10 @@ export function VehicleDetail() {
           {/* Artistic Car Image Banner */}
           <div className="relative mb-4 rounded-lg overflow-hidden h-48">
             <img
-              src={`https://source.unsplash.com/800x300/?${encodeURIComponent(vehicle.make + ' ' + vehicle.model + ' car')},vintage,classic`}
+              src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=300&fit=crop&auto=format"
               alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
               className="w-full h-full object-cover"
               style={{ filter: 'saturate(1.2) contrast(1.1)' }}
-              onError={(e) => {
-                // Fallback to generic vintage car image
-                (e.target as HTMLImageElement).src = 'https://source.unsplash.com/800x300/?vintage+car+classic';
-              }}
             />
             <div className="absolute inset-0 bg-gradient-to-r from-blue-900/60 via-transparent to-amber-900/40"></div>
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent">

@@ -21,13 +21,10 @@ export function ServiceRecommendationList({ services, vehicle }: Props) {
       {/* Artistic Car Image Banner */}
       <div className="relative h-56 overflow-hidden">
         <img
-          src={`https://source.unsplash.com/800x400/?${encodeURIComponent(vehicle.make + ' ' + vehicle.model + ' car')},automotive,classic`}
+          src={`https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=800&h=400&fit=crop&auto=format`}
           alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
           className="w-full h-full object-cover"
           style={{ filter: 'saturate(1.3) contrast(1.1)' }}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://source.unsplash.com/800x400/?vintage+car+automotive';
-          }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-blue-900/70 via-blue-800/40 to-amber-900/50"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
