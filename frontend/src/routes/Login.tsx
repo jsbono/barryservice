@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../lib/auth';
 
 export function Login() {
@@ -26,23 +26,35 @@ export function Login() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center px-4">
-      <div className="max-w-md w-full">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
-            Mechanic Login
-          </h2>
+    <div className="min-h-[85vh] flex items-center justify-center px-4 py-12">
+      <div className="max-w-md w-full fade-in">
+        <div className="glass-card p-8">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">Welcome Back</h2>
+            <p className="text-gray-500 mt-1">Sign in to your mechanic dashboard</p>
+          </div>
 
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 text-sm">
-              {error}
+            <div className="mb-6 glass-card p-4 border-l-4 border-red-500">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-red-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+                <span className="text-red-700 text-sm">{error}</span>
+              </div>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                Email Address
               </label>
               <input
                 id="email"
@@ -50,13 +62,13 @@ export function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-modern"
                 placeholder="mechanic@example.com"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
                 Password
               </label>
               <input
@@ -65,7 +77,7 @@ export function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="input-modern"
                 placeholder="Enter your password"
               />
             </div>
@@ -73,15 +85,40 @@ export function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="btn-primary w-full flex items-center justify-center"
             >
-              {loading ? 'Logging in...' : 'Login'}
+              {loading ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+                  Signing in...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                  </svg>
+                  Sign In
+                </>
+              )}
             </button>
           </form>
 
-          <p className="mt-4 text-sm text-gray-500 text-center">
-            Demo credentials: mechanic@example.com / password123
-          </p>
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <p className="text-sm text-gray-500 text-center">
+              Demo credentials:
+            </p>
+            <div className="mt-2 p-3 bg-gray-50 rounded-lg text-center">
+              <code className="text-sm text-indigo-600">mechanic@example.com</code>
+              <span className="text-gray-400 mx-2">/</span>
+              <code className="text-sm text-indigo-600">password123</code>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center">
+            <Link to="/" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+              &larr; Back to Service Lookup
+            </Link>
+          </div>
         </div>
       </div>
     </div>

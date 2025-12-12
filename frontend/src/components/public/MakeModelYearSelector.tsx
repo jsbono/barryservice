@@ -55,17 +55,28 @@ export function MakeModelYearSelector({ onSelect }: Props) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Find Your Vehicle</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="glass-card p-8">
+      <div className="flex items-center mb-6">
+        <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center mr-4 shadow-lg">
+          <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <h2 className="text-2xl font-bold text-gray-800">Find Your Vehicle</h2>
+          <p className="text-gray-500 text-sm">Select make, model, and year to get started</p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">
             Make
           </label>
           <select
             value={selectedMake}
             onChange={(e) => setSelectedMake(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="select-modern"
             disabled={loading}
           >
             <option value="">Select Make</option>
@@ -77,17 +88,17 @@ export function MakeModelYearSelector({ onSelect }: Props) {
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">
             Model
           </label>
           <select
             value={selectedModel}
             onChange={(e) => setSelectedModel(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="select-modern"
             disabled={!selectedMake || loading}
           >
-            <option value="">Select Model</option>
+            <option value="">{selectedMake ? 'Select Model' : 'Select make first'}</option>
             {models.map((model) => (
               <option key={model} value={model}>
                 {model}
@@ -96,17 +107,17 @@ export function MakeModelYearSelector({ onSelect }: Props) {
           </select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+        <div className="space-y-2">
+          <label className="block text-sm font-semibold text-gray-700">
             Year
           </label>
           <select
             value={selectedYear}
             onChange={(e) => setSelectedYear(Number(e.target.value))}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="select-modern"
             disabled={!selectedModel || loading}
           >
-            <option value="">Select Year</option>
+            <option value="">{selectedModel ? 'Select Year' : 'Select model first'}</option>
             {years.map((year) => (
               <option key={year} value={year}>
                 {year}
@@ -118,10 +129,22 @@ export function MakeModelYearSelector({ onSelect }: Props) {
 
       <button
         onClick={handleSearch}
-        disabled={!selectedMake || !selectedModel || !selectedYear}
-        className="mt-4 w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+        disabled={!selectedMake || !selectedModel || !selectedYear || loading}
+        className="btn-primary w-full mt-6 flex items-center justify-center"
       >
-        {loading ? 'Loading...' : 'Search Services'}
+        {loading ? (
+          <>
+            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2"></div>
+            Loading...
+          </>
+        ) : (
+          <>
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Search Services
+          </>
+        )}
       </button>
     </div>
   );
