@@ -7,8 +7,10 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "migrate": "tsx src/config/migrate.ts",
-    "seed": "tsx src/config/seed.ts"
+    "migrate": "node dist/config/migrate.js",
+    "migrate:dev": "tsx src/config/migrate.ts",
+    "seed": "node dist/config/seed.js",
+    "seed:dev": "tsx src/config/seed.ts"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
