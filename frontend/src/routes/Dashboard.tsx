@@ -5,6 +5,7 @@ import { StatsSummary } from '../components/dashboard/StatsSummary';
 import { UpcomingServicesTable } from '../components/dashboard/UpcomingServicesTable';
 import { RecentActivityList } from '../components/dashboard/RecentActivityList';
 import { ExpectedServicesTable } from '../components/dashboard/ExpectedServicesTable';
+import { InsightsPanel } from '../components/insights/InsightsPanel';
 import { getCustomers, getVehicles, getUpcomingServices, getRecentActivity } from '../lib/api';
 import { ServiceLog } from '../lib/types';
 
@@ -46,16 +47,21 @@ function DashboardOverview() {
   }
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6">Dashboard Overview</h1>
+    <div className="p-4 md:p-6">
+      <h1 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">Dashboard Overview</h1>
       <StatsSummary stats={stats} />
 
+      {/* AI Insights Panel */}
+      <div className="mb-4 md:mb-6">
+        <InsightsPanel />
+      </div>
+
       {/* Expected Services - Main Feature */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <ExpectedServicesTable />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <UpcomingServicesTable services={upcomingServices} />
         <RecentActivityList activities={recentActivity} />
       </div>

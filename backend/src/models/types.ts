@@ -131,3 +131,73 @@ export interface AuthPayload {
   email: string;
   role: string;
 }
+
+// AI Insights Engine types
+export type InsightType = 'service_due' | 'customer_health' | 'revenue' | 'anomaly' | 'digest';
+export type InsightPriority = 'high' | 'medium' | 'low';
+export type InsightActionType = 'schedule_service' | 'contact_customer' | 'review' | 'create_estimate' | 'view';
+
+export interface Insight {
+  id: string;
+  type: InsightType;
+  priority: InsightPriority;
+  title: string;
+  body: string;
+  customer_id?: string;
+  vehicle_id?: string;
+  action_type?: InsightActionType;
+  action_url?: string;
+  metadata?: string;
+  read_at?: string;
+  actioned_at?: string;
+  dismissed_at?: string;
+  created_at: string;
+  expires_at?: string;
+}
+
+export interface InsightWithRelations extends Insight {
+  customer?: Customer;
+  vehicle?: Vehicle;
+}
+
+export interface CreateInsightRequest {
+  type: InsightType;
+  priority: InsightPriority;
+  title: string;
+  body: string;
+  customer_id?: string;
+  vehicle_id?: string;
+  action_type?: InsightActionType;
+  action_url?: string;
+  metadata?: Record<string, any>;
+  expires_at?: string;
+}
+
+export type AgentRunStatus = 'running' | 'completed' | 'failed';
+
+export interface AgentRun {
+  id: string;
+  agent_type: string;
+  started_at: string;
+  completed_at?: string;
+  status: AgentRunStatus;
+  insights_created: number;
+  tokens_used?: number;
+  cost_cents?: number;
+  error_message?: string;
+  metadata?: string;
+}
+
+export interface CreateAgentRunRequest {
+  agent_type: string;
+}
+
+export interface UpdateAgentRunRequest {
+  status?: AgentRunStatus;
+  completed_at?: string;
+  insights_created?: number;
+  tokens_used?: number;
+  cost_cents?: number;
+  error_message?: string;
+  metadata?: Record<string, any>;
+}

@@ -13,6 +13,9 @@ import serviceRoutes from './routes/services.js';
 import lookupRoutes from './routes/lookup.js';
 import automationRoutes from './routes/automation.js';
 import customerPortalRoutes from './routes/customerPortal.js';
+import insightsRoutes from './routes/insights.js';
+import agentsRoutes from './routes/agents.js';
+import { startAgentScheduler } from './agent/scheduler.js';
 const app = express();
 
 // Middleware
@@ -27,6 +30,8 @@ app.use('/api/services', serviceRoutes);
 app.use('/api/lookup', lookupRoutes);
 app.use('/api/automation', automationRoutes);
 app.use('/api/portal', customerPortalRoutes); // Customer portal API
+app.use('/api/insights', insightsRoutes);
+app.use('/api/agents', agentsRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -65,6 +70,9 @@ cron.schedule('0 9 * * *', async () => {
 app.listen(config.port, () => {
   console.log(`Server running on port ${config.port}`);
   console.log(`Environment: ${config.nodeEnv}`);
+
+  // Start the AI agent scheduler
+  startAgentScheduler();
 });
 
 export default app;

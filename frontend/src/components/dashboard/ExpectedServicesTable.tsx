@@ -132,96 +132,142 @@ export function ExpectedServicesTable() {
           No services {filter === 'due' ? 'due or overdue' : 'found'}.
         </div>
       ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Customer
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Vehicle
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Service
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Type
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Current / Due At
-                </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Miles Until Due
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
-              {data.services.map((service, index) => (
-                <tr
-                  key={`${service.vehicle_id}-${service.service_name}-${index}`}
-                  className={`hover:bg-gray-50 ${
-                    service.status === 'overdue' ? 'bg-red-50' : ''
-                  }`}
-                >
-                  <td className="px-4 py-3 whitespace-nowrap">
+        <>
+          {/* Mobile Card View */}
+          <div className="md:hidden divide-y divide-gray-200">
+            {data.services.map((service, index) => (
+              <div
+                key={`mobile-${service.vehicle_id}-${service.service_name}-${index}`}
+                className={`p-4 ${service.status === 'overdue' ? 'bg-red-50' : ''}`}
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <div className="flex gap-2">
                     {getStatusBadge(service.status)}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="text-sm font-medium text-gray-900">
-                      {service.customer_name}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {service.customer_email}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Link
-                      to={`/dashboard/vehicles/${service.vehicle_id}`}
-                      className="text-sm text-blue-600 hover:underline"
-                    >
-                      {service.vehicle_info}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-sm font-medium text-gray-900">
-                      {service.service_name}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
                     {getCategoryBadge(service.category)}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
-                    {service.current_mileage?.toLocaleString() || '?'} /{' '}
-                    {service.next_due_mileage.toLocaleString()}
-                  </td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    {service.miles_until_due !== null ? (
-                      <span
-                        className={`text-sm font-medium ${
-                          service.miles_until_due <= 0
-                            ? 'text-red-600'
-                            : service.miles_until_due <= 1000
-                            ? 'text-yellow-600'
-                            : 'text-gray-600'
-                        }`}
-                      >
-                        {service.miles_until_due <= 0
-                          ? `${Math.abs(service.miles_until_due).toLocaleString()} over`
-                          : `${service.miles_until_due.toLocaleString()} mi`}
-                      </span>
-                    ) : (
-                      <span className="text-sm text-gray-400">Unknown</span>
-                    )}
-                  </td>
+                  </div>
+                  {service.miles_until_due !== null && (
+                    <span
+                      className={`text-sm font-bold ${
+                        service.miles_until_due <= 0
+                          ? 'text-red-600'
+                          : service.miles_until_due <= 1000
+                          ? 'text-yellow-600'
+                          : 'text-gray-600'
+                      }`}
+                    >
+                      {service.miles_until_due <= 0
+                        ? `${Math.abs(service.miles_until_due).toLocaleString()} over`
+                        : `${service.miles_until_due.toLocaleString()} mi`}
+                    </span>
+                  )}
+                </div>
+                <div className="font-medium text-gray-900">{service.service_name}</div>
+                <Link
+                  to={`/dashboard/vehicles/${service.vehicle_id}`}
+                  className="text-sm text-blue-600"
+                >
+                  {service.vehicle_info}
+                </Link>
+                <div className="text-sm text-gray-600 mt-1">{service.customer_name}</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {service.current_mileage?.toLocaleString() || '?'} / {service.next_due_mileage.toLocaleString()} mi
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Customer
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Vehicle
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Service
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Type
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Current / Due At
+                  </th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    Miles Until Due
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {data.services.map((service, index) => (
+                  <tr
+                    key={`${service.vehicle_id}-${service.service_name}-${index}`}
+                    className={`hover:bg-gray-50 ${
+                      service.status === 'overdue' ? 'bg-red-50' : ''
+                    }`}
+                  >
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {getStatusBadge(service.status)}
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="text-sm font-medium text-gray-900">
+                        {service.customer_name}
+                      </div>
+                      <div className="text-xs text-gray-500">
+                        {service.customer_email}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link
+                        to={`/dashboard/vehicles/${service.vehicle_id}`}
+                        className="text-sm text-blue-600 hover:underline"
+                      >
+                        {service.vehicle_info}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className="text-sm font-medium text-gray-900">
+                        {service.service_name}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {getCategoryBadge(service.category)}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
+                      {service.current_mileage?.toLocaleString() || '?'} /{' '}
+                      {service.next_due_mileage.toLocaleString()}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      {service.miles_until_due !== null ? (
+                        <span
+                          className={`text-sm font-medium ${
+                            service.miles_until_due <= 0
+                              ? 'text-red-600'
+                              : service.miles_until_due <= 1000
+                              ? 'text-yellow-600'
+                              : 'text-gray-600'
+                          }`}
+                        >
+                          {service.miles_until_due <= 0
+                            ? `${Math.abs(service.miles_until_due).toLocaleString()} over`
+                            : `${service.miles_until_due.toLocaleString()} mi`}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-400">Unknown</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
 
       {data.services.length > 0 && (

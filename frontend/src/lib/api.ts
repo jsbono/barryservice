@@ -261,3 +261,52 @@ export async function setCustomerPassword(customerId: string, password: string):
     body: JSON.stringify({ password }),
   });
 }
+
+// Insights API
+import { Insight, InsightsResponse, InsightStats, InsightPriority, InsightType } from './types';
+
+export async function getInsights(options?: {
+  type?: InsightType;
+  priority?: InsightPriority;
+  unread?: boolean;
+  limit?: number;
+  offset?: number;
+}): Promise<InsightsResponse> {
+  const params = new URLSearchParams();
+  if (options?.type) params.append('type', options.type);
+  if (options?.priority) params.append('priority', options.priority);
+  if (options?.unread) params.append('unread', 'true');
+  if (options?.limit) params.append('limit', String(options.limit));
+  if (options?.offset) params.append('offset', String(options.offset));
+  return fetchApi<InsightsResponse>(`/insights?${params}`);
+}
+
+export async function getInsight(id: string): Promise<Insight> {
+  return fetchApi<Insight>(`/insights/${id}`);
+}
+
+export async function markInsightRead(id: string): Promise<Insight> {
+  return fetchApi<Insight>(`/insights/${id}/read`, { method: 'PUT' });
+}
+
+export async function markInsightActioned(id: string): Promise<Insight> {
+  return fetchApi<Insight>(`/insights/${id}/action`, { method: 'PUT' });
+}
+
+export async function dismissInsight(id: string): Promise<Insight> {
+  return fetchApi<Insight>(`/insights/${id}/dismiss`, { method: 'PUT' });
+}
+
+export async function getInsightStats(): Promise<InsightStats> {
+  return fetchApi<InsightStats>('/insights/stats');
+}
+
+// Agent API
+export async function triggerAgentRun(agentType: string): Promise<{
+  success: boolean;
+  insightsCreated?: number;
+  tokensUsed?: number;
+  error?: string;
+}> {
+  return fetchApi(`/agents/run/${agentType}`, { method: 'POST' });
+}

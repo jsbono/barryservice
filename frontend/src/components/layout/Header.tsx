@@ -1,9 +1,11 @@
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../lib/auth';
 
 export function Header() {
   const { isAuthenticated, logout } = useAuth();
   const location = useLocation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -25,8 +27,8 @@ export function Header() {
             </div>
           </Link>
 
-          {/* Navigation */}
-          <nav className="flex items-center space-x-1">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1">
             <Link
               to="/"
               className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
@@ -66,7 +68,80 @@ export function Header() {
               </Link>
             )}
           </nav>
+
+          {/* Mobile menu button */}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {mobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
         </div>
+
+        {/* Mobile Navigation */}
+        {mobileMenuOpen && (
+          <nav className="md:hidden py-4 border-t border-gray-100">
+            <div className="flex flex-col space-y-2">
+              <Link
+                to="/"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                  isActive('/') ? 'bg-blue-50 text-blue-600' : 'text-gray-600'
+                }`}
+              >
+                Service Lookup
+              </Link>
+
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`px-4 py-3 rounded-lg font-medium transition-all ${
+                      location.pathname.startsWith('/dashboard') ? 'bg-blue-50 text-blue-600' : 'text-gray-600'
+                    }`}
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    to="/dashboard/customers"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 rounded-lg font-medium text-gray-600 pl-8"
+                  >
+                    Customers
+                  </Link>
+                  <Link
+                    to="/dashboard/settings"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-4 py-3 rounded-lg font-medium text-gray-600 pl-8"
+                  >
+                    Settings
+                  </Link>
+                  <button
+                    onClick={() => { logout(); setMobileMenuOpen(false); }}
+                    className="px-4 py-3 rounded-lg font-medium text-red-600 text-left"
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  to="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-4 py-3 rounded-lg font-medium bg-blue-600 text-white text-center"
+                >
+                  Sign In
+                </Link>
+              )}
+            </div>
+          </nav>
+        )}
       </div>
     </header>
   );

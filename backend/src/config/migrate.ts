@@ -84,6 +84,46 @@ CREATE INDEX IF NOT EXISTS idx_email_logs_service_log_id ON email_logs(service_l
 CREATE INDEX IF NOT EXISTS idx_service_recommendations_make_model_year ON service_recommendations(make, model, year);
 CREATE INDEX IF NOT EXISTS idx_scheduled_services_vehicle_id ON scheduled_services(vehicle_id);
 CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);
+
+-- AI Insights Engine tables
+CREATE TABLE IF NOT EXISTS insights (
+  id TEXT PRIMARY KEY,
+  type TEXT NOT NULL,
+  priority TEXT NOT NULL,
+  title TEXT NOT NULL,
+  body TEXT NOT NULL,
+  customer_id TEXT REFERENCES customers(id) ON DELETE SET NULL,
+  vehicle_id TEXT REFERENCES vehicles(id) ON DELETE SET NULL,
+  action_type TEXT,
+  action_url TEXT,
+  metadata TEXT,
+  read_at TEXT,
+  actioned_at TEXT,
+  dismissed_at TEXT,
+  created_at TEXT NOT NULL DEFAULT (datetime('now')),
+  expires_at TEXT
+);
+
+CREATE TABLE IF NOT EXISTS agent_runs (
+  id TEXT PRIMARY KEY,
+  agent_type TEXT NOT NULL,
+  started_at TEXT NOT NULL,
+  completed_at TEXT,
+  status TEXT NOT NULL,
+  insights_created INTEGER DEFAULT 0,
+  tokens_used INTEGER,
+  cost_cents INTEGER,
+  error_message TEXT,
+  metadata TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_insights_type ON insights(type);
+CREATE INDEX IF NOT EXISTS idx_insights_priority ON insights(priority, created_at);
+CREATE INDEX IF NOT EXISTS idx_insights_customer_id ON insights(customer_id);
+CREATE INDEX IF NOT EXISTS idx_insights_vehicle_id ON insights(vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_insights_unread ON insights(read_at);
+CREATE INDEX IF NOT EXISTS idx_agent_runs_type ON agent_runs(agent_type);
+CREATE INDEX IF NOT EXISTS idx_agent_runs_status ON agent_runs(status);
 `;
 
 // Additional migrations for existing databases

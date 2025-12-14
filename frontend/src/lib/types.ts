@@ -153,3 +153,48 @@ export interface PortalScheduledService {
   notes?: string;
   status: string;
 }
+
+// AI Insights Types
+export type InsightType = 'service_due' | 'customer_health' | 'revenue_opportunity' | 'anomaly' | 'digest';
+export type InsightPriority = 'high' | 'medium' | 'low';
+export type InsightActionType = 'schedule_service' | 'contact_customer' | 'review' | 'dismiss' | null;
+
+export interface Insight {
+  id: string;
+  type: InsightType;
+  priority: InsightPriority;
+  title: string;
+  body: string;
+  customer_id?: string;
+  vehicle_id?: string;
+  action_type?: InsightActionType;
+  action_url?: string;
+  metadata?: Record<string, unknown>;
+  read_at?: string;
+  actioned_at?: string;
+  dismissed_at?: string;
+  created_at: string;
+  expires_at?: string;
+  customer?: Customer;
+  vehicle?: Vehicle;
+}
+
+export interface InsightsResponse {
+  insights: Insight[];
+  meta: {
+    unreadCount: number;
+    priorityCounts: { high: number; medium: number; low: number };
+    total: number;
+  };
+}
+
+export interface InsightStats {
+  unreadCount: number;
+  priorityCounts: { high: number; medium: number; low: number };
+  agentStats: {
+    totalRuns: number;
+    successfulRuns: number;
+    totalInsightsCreated: number;
+    totalTokensUsed: number;
+  };
+}

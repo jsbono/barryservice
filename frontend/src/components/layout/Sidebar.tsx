@@ -10,7 +10,7 @@ export function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="w-64 bg-gray-800 text-white min-h-screen">
+    <aside className="hidden md:block w-64 bg-gray-800 text-white min-h-screen flex-shrink-0">
       <div className="p-4">
         <h2 className="text-lg font-semibold mb-4">Dashboard</h2>
         <nav className="space-y-2">
