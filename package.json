@@ -7,10 +7,10 @@
     "build:frontend": "cd frontend && npm run build",
     "build:backend": "cd backend && npm run build",
     "build": "npm run build:frontend && npm run build:backend",
-    "start": "cd backend && npm start",
+    "start": "cd backend && node dist/index.js",
     "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
-    "migrate": "cd backend && npm run migrate",
-    "seed": "cd backend && npm run seed",
+    "migrate": "cd backend && node dist/config/migrate.js",
+    "seed": "cd backend && node dist/config/seed.js",
     "postinstall": "npm run install:all"
   },
   "engines": {
