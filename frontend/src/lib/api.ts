@@ -310,3 +310,292 @@ export async function triggerAgentRun(agentType: string): Promise<{
 }> {
   return fetchApi(`/agents/run/${agentType}`, { method: 'POST' });
 }
+
+// Invoice API
+import {
+  Invoice,
+  InvoicesResponse,
+  InvoiceStats,
+  CreateInvoiceRequest,
+  InvoiceStatus,
+  PartsResponse,
+  VoiceParseResponse,
+  VoiceTranscribeResponse,
+  VoiceProcessResponse,
+  ServiceCode,
+} from './types';
+
+export async function getInvoices(options?: {
+  status?: InvoiceStatus;
+  customer_id?: string;
+  start_date?: string;
+  end_date?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<InvoicesResponse> {
+  const params = new URLSearchParams();
+  if (options?.status) params.append('status', options.status);
+  if (options?.customer_id) params.append('customer_id', options.customer_id);
+  if (options?.start_date) params.append('start_date', options.start_date);
+  if (options?.end_date) params.append('end_date', options.end_date);
+  if (options?.limit) params.append('limit', String(options.limit));
+  if (options?.offset) params.append('offset', String(options.offset));
+  return fetchApi<InvoicesResponse>(`/invoices?${params}`);
+}
+
+export async function getInvoice(id: string): Promise<Invoice> {
+  return fetchApi<Invoice>(`/invoices/${id}`);
+}
+
+export async function getInvoiceStats(): Promise<InvoiceStats> {
+  return fetchApi<InvoiceStats>('/invoices/stats');
+}
+
+export async function createInvoice(data: CreateInvoiceRequest): Promise<Invoice> {
+  return fetchApi<Invoice>('/invoices', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export interface QuickInvoiceService {
+  name: string;
+  price: number;
+  quantity?: number;
+  labor_hours?: number;
+}
+
+export interface CreateQuickInvoiceRequest {
+  customer_id: string;
+  vehicle_id?: string;
+  services: QuickInvoiceService[];
+  notes?: string;
+  tax_rate?: number;
+  status?: InvoiceStatus;
+}
+
+export async function createQuickInvoice(data: CreateQuickInvoiceRequest): Promise<{ message: string; invoice: Invoice }> {
+  return fetchApi<{ message: string; invoice: Invoice }>('/invoices/quick', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateInvoice(id: string, data: { status?: InvoiceStatus; notes?: string; due_date?: string }): Promise<Invoice> {
+  return fetchApi<Invoice>(`/invoices/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteInvoice(id: string): Promise<void> {
+  return fetchApi<void>(`/invoices/${id}`, { method: 'DELETE' });
+}
+
+export async function downloadInvoicePdf(id: string): Promise<Blob> {
+  const token = localStorage.getItem('token');
+  const response = await fetch(`${API_BASE}/invoices/${id}/pdf`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to download PDF');
+  }
+  return response.blob();
+}
+
+export async function sendInvoice(id: string): Promise<{ success: boolean; message: string }> {
+  return fetchApi<{ success: boolean; message: string }>(`/invoices/${id}/send`, { method: 'POST' });
+}
+
+export async function markInvoicePaid(id: string): Promise<Invoice> {
+  return fetchApi<Invoice>(`/invoices/${id}/mark-paid`, { method: 'POST' });
+}
+
+// Parts API
+export async function getParts(): Promise<PartsResponse> {
+  return fetchApi<PartsResponse>('/parts');
+}
+
+export async function searchParts(query: string): Promise<PartsResponse> {
+  return fetchApi<PartsResponse>(`/parts/search?q=${encodeURIComponent(query)}`);
+}
+
+// Voice API
+export async function parseVoiceTranscript(transcript: string, vehicleId?: string): Promise<VoiceParseResponse> {
+  return fetchApi<VoiceParseResponse>('/voice/parse', {
+    method: 'POST',
+    body: JSON.stringify({ transcript, vehicleId }),
+  });
+}
+
+export async function transcribeAudio(audioBlob: Blob, filename?: string): Promise<VoiceTranscribeResponse> {
+  const token = localStorage.getItem('token');
+  const formData = new FormData();
+  formData.append('audio', audioBlob, filename || 'recording.webm');
+
+  const response = await fetch(`${API_BASE}/voice/transcribe`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Transcription failed' }));
+    throw new Error(error.error || 'Transcription failed');
+  }
+
+  return response.json();
+}
+
+export async function processVoiceAudio(audioBlob: Blob, vehicleId?: string): Promise<VoiceProcessResponse> {
+  const token = localStorage.getItem('token');
+  const formData = new FormData();
+  formData.append('audio', audioBlob, 'recording.webm');
+  if (vehicleId) formData.append('vehicleId', vehicleId);
+
+  const response = await fetch(`${API_BASE}/voice/process`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Voice processing failed' }));
+    throw new Error(error.error || 'Voice processing failed');
+  }
+
+  return response.json();
+}
+
+export async function getServiceCodes(): Promise<{ success: boolean; serviceCodes: ServiceCode[] }> {
+  return fetchApi<{ success: boolean; serviceCodes: ServiceCode[] }>('/voice/service-codes');
+}
+
+// Customer Portal Invoice API
+export async function getCustomerInvoices(vehicleId?: string): Promise<{ invoices: Invoice[] }> {
+  const token = localStorage.getItem('customer_token');
+  const url = vehicleId ? `/portal/invoices?vehicle_id=${vehicleId}` : '/portal/invoices';
+  const response = await fetch(`${API_BASE}${url}`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to fetch invoices');
+  }
+  return response.json();
+}
+
+export async function downloadCustomerInvoicePdf(invoiceId: string): Promise<Blob> {
+  const token = localStorage.getItem('customer_token');
+  const response = await fetch(`${API_BASE}/portal/invoices/${invoiceId}/pdf`, {
+    headers: {
+      'Authorization': `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Failed to download PDF');
+  }
+  return response.blob();
+}
+
+// Settings API - Service Prices
+import { ServicePrice, LaborRate } from './types';
+
+export async function getServicePrices(includeInactive = false): Promise<{ success: boolean; prices: ServicePrice[] }> {
+  const params = includeInactive ? '?include_inactive=true' : '';
+  return fetchApi<{ success: boolean; prices: ServicePrice[] }>(`/settings/service-prices${params}`);
+}
+
+export async function getServicePrice(id: string): Promise<{ success: boolean; price: ServicePrice }> {
+  return fetchApi<{ success: boolean; price: ServicePrice }>(`/settings/service-prices/${id}`);
+}
+
+export async function createServicePrice(data: {
+  service_type: string;
+  display_name: string;
+  base_price: number;
+  labor_hours: number;
+  description?: string;
+}): Promise<{ success: boolean; price: ServicePrice }> {
+  return fetchApi<{ success: boolean; price: ServicePrice }>('/settings/service-prices', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateServicePrice(
+  id: string,
+  data: {
+    display_name?: string;
+    base_price?: number;
+    labor_hours?: number;
+    description?: string;
+    is_active?: boolean;
+  }
+): Promise<{ success: boolean; price: ServicePrice }> {
+  return fetchApi<{ success: boolean; price: ServicePrice }>(`/settings/service-prices/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteServicePrice(id: string): Promise<{ success: boolean }> {
+  return fetchApi<{ success: boolean }>(`/settings/service-prices/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+// Settings API - Labor Rates
+export async function getLaborRates(): Promise<{ success: boolean; rates: LaborRate[] }> {
+  return fetchApi<{ success: boolean; rates: LaborRate[] }>('/settings/labor-rates');
+}
+
+export async function getDefaultLaborRate(): Promise<{ success: boolean; rate: LaborRate }> {
+  return fetchApi<{ success: boolean; rate: LaborRate }>('/settings/labor-rates/default');
+}
+
+export async function updateLaborRate(
+  id: string,
+  data: { name?: string; rate_per_hour?: number; is_default?: boolean }
+): Promise<{ success: boolean; rate: LaborRate }> {
+  return fetchApi<{ success: boolean; rate: LaborRate }>(`/settings/labor-rates/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function createLaborRate(data: {
+  name: string;
+  rate_per_hour: number;
+  is_default?: boolean;
+}): Promise<{ success: boolean; rate: LaborRate }> {
+  return fetchApi<{ success: boolean; rate: LaborRate }>('/settings/labor-rates', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+// Get completed services for quick invoice creation
+export async function getCompletedServicesForInvoice(limit = 50): Promise<{
+  services: Array<ServiceLog & {
+    vehicle?: Vehicle;
+    customer?: Customer;
+    hasInvoice: boolean;
+  }>;
+}> {
+  return fetchApi<{
+    services: Array<ServiceLog & {
+      vehicle?: Vehicle;
+      customer?: Customer;
+      hasInvoice: boolean;
+    }>;
+  }>(`/services/completed?limit=${limit}`);
+}

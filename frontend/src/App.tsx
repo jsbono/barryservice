@@ -10,9 +10,15 @@ import { Customers } from './routes/Customers';
 import { CustomerDetail } from './routes/CustomerDetail';
 import { VehicleDetail } from './routes/VehicleDetail';
 import { Settings } from './routes/Settings';
+import { Invoices } from './routes/Invoices';
+import { InvoiceDetail } from './routes/InvoiceDetail';
+import { NewInvoice } from './routes/NewInvoice';
+import { VoiceServiceEntry } from './routes/VoiceServiceEntry';
 import { PortalLogin } from './routes/portal/PortalLogin';
 import { PortalDashboard } from './routes/portal/PortalDashboard';
 import { PortalVehicleDetail } from './routes/portal/PortalVehicleDetail';
+import { PortalInvoices } from './routes/portal/PortalInvoices';
+import { TestVehicleImage } from './routes/TestVehicleImage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isLoading } = useAuth();
@@ -54,7 +60,7 @@ function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 pt-16">{children}</main>
       <Footer />
     </div>
   );
@@ -66,6 +72,9 @@ export default function App() {
       <AuthProvider>
         <CustomerAuthProvider>
           <Routes>
+            {/* Test page for vehicle images - no auth required */}
+            <Route path="/test-images" element={<TestVehicleImage />} />
+
             {/* Customer Portal routes - standalone, no main header/footer */}
             <Route path="/portal/login" element={<PortalLogin />} />
             <Route
@@ -81,6 +90,14 @@ export default function App() {
               element={
                 <ProtectedCustomerRoute>
                   <PortalVehicleDetail />
+                </ProtectedCustomerRoute>
+              }
+            />
+            <Route
+              path="/portal/invoices"
+              element={
+                <ProtectedCustomerRoute>
+                  <PortalInvoices />
                 </ProtectedCustomerRoute>
               }
             />
@@ -115,6 +132,10 @@ export default function App() {
               <Route path="customers" element={<Customers />} />
               <Route path="customers/:id" element={<CustomerDetail />} />
               <Route path="vehicles/:id" element={<VehicleDetail />} />
+              <Route path="invoices" element={<Invoices />} />
+              <Route path="invoices/new" element={<NewInvoice />} />
+              <Route path="invoices/:id" element={<InvoiceDetail />} />
+              <Route path="voice" element={<VoiceServiceEntry />} />
               <Route path="settings" element={<Settings />} />
             </Route>
           </Routes>

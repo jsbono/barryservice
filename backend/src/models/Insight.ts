@@ -30,10 +30,10 @@ export function findAll(options: {
   }
 
   if (!includeExpired) {
-    sql += ' AND (expires_at IS NULL OR expires_at > datetime("now"))';
+    sql += " AND (expires_at IS NULL OR expires_at > datetime('now'))";
   }
 
-  sql += ' ORDER BY CASE priority WHEN "high" THEN 1 WHEN "medium" THEN 2 ELSE 3 END, created_at DESC';
+  sql += " ORDER BY CASE priority WHEN 'high' THEN 1 WHEN 'medium' THEN 2 ELSE 3 END, created_at DESC";
   sql += ' LIMIT ? OFFSET ?';
   params.push(limit, offset);
 
@@ -135,7 +135,7 @@ export function remove(id: string): boolean {
 
 export function countUnread(): number {
   const result = queryOne<{ count: number }>(
-    'SELECT COUNT(*) as count FROM insights WHERE read_at IS NULL AND dismissed_at IS NULL AND (expires_at IS NULL OR expires_at > datetime("now"))'
+    "SELECT COUNT(*) as count FROM insights WHERE read_at IS NULL AND dismissed_at IS NULL AND (expires_at IS NULL OR expires_at > datetime('now'))"
   );
   return result?.count || 0;
 }
@@ -143,7 +143,7 @@ export function countUnread(): number {
 export function countByPriority(): { high: number; medium: number; low: number } {
   const results = query<{ priority: string; count: number }>(
     `SELECT priority, COUNT(*) as count FROM insights
-     WHERE dismissed_at IS NULL AND (expires_at IS NULL OR expires_at > datetime("now"))
+     WHERE dismissed_at IS NULL AND (expires_at IS NULL OR expires_at > datetime('now'))
      GROUP BY priority`
   );
 

@@ -83,8 +83,8 @@ export function create(
   const id = uuidv4();
   const now = new Date().toISOString();
   execute(
-    `INSERT INTO service_logs (id, vehicle_id, service_type, notes, service_date, mileage_at_service, next_service_date, next_service_mileage, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO service_logs (id, vehicle_id, service_type, notes, service_date, mileage_at_service, labor_hours, next_service_date, next_service_mileage, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     [
       id,
       data.vehicle_id,
@@ -92,6 +92,7 @@ export function create(
       data.notes || null,
       data.service_date,
       data.mileage_at_service || null,
+      data.labor_hours || null,
       nextServiceDate ? nextServiceDate.toISOString().split('T')[0] : null,
       nextServiceMileage || null,
       now,
@@ -119,6 +120,10 @@ export function update(id: string, data: UpdateServiceLogRequest): ServiceLog | 
   if (data.mileage_at_service !== undefined) {
     fields.push(`mileage_at_service = ?`);
     values.push(data.mileage_at_service);
+  }
+  if (data.labor_hours !== undefined) {
+    fields.push(`labor_hours = ?`);
+    values.push(data.labor_hours);
   }
   if (data.next_service_date !== undefined) {
     fields.push(`next_service_date = ?`);

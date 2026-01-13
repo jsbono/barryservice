@@ -15,4 +15,8 @@ router.get('/vehicle/:vehicleId/services', authMiddleware, customerAuthControlle
 router.get('/vehicle/:vehicleId/recommended', authMiddleware, customerAuthController.getVehicleRecommended);
 router.get('/vehicle/:vehicleId/scheduled', authMiddleware, customerAuthController.getVehicleScheduled);
 
+// Invoice routes for customer portal
+router.get('/invoices', authMiddleware, customerAuthController.getMyInvoices);
+router.get('/invoices/:invoiceId/pdf', authMiddleware, customerAuthController.getInvoicePdf);
+
 export default router;

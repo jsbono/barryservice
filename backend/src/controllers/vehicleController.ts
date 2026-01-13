@@ -3,6 +3,7 @@ import * as VehicleModel from '../models/Vehicle.js';
 import * as ServiceLogModel from '../models/ServiceLog.js';
 import * as CustomerModel from '../models/Customer.js';
 import { CreateVehicleRequest, UpdateVehicleRequest } from '../models/types.js';
+import * as VehicleIntelligence from '../services/vehicleIntelligence.js';
 
 export function list(req: Request, res: Response): void {
   try {
@@ -39,9 +40,9 @@ export function getById(req: Request, res: Response): void {
   }
 }
 
-export function create(req: Request, res: Response): void {
+export async function create(req: Request, res: Response): Promise<void> {
   try {
-    const data = req.body as CreateVehicleRequest;
+    let data = req.body as CreateVehicleRequest;
 
     if (!data.customer_id || !data.make || !data.model || !data.year) {
       res.status(400).json({ error: 'customer_id, make, model, and year are required' });
@@ -55,7 +56,59 @@ export function create(req: Request, res: Response): void {
       return;
     }
 
+    // Auto-decode VIN if provided to enhance vehicle data
+    let vinDecodeResult: VehicleIntelligence.VINDecodeResult | null = null;
+    if (data.vin) {
+      try {
+        vinDecodeResult = await VehicleIntelligence.decodeVIN(data.vin);
+        if (vinDecodeResult.success) {
+          // Use decoded data if our data is missing or generic
+          // Only override if the decoded values are present
+          if (vinDecodeResult.make && (!data.make || data.make === 'Unknown')) {
+            data = { ...data, make: vinDecodeResult.make };
+          }
+          if (vinDecodeResult.model && (!data.model || data.model === 'Unknown')) {
+            data = { ...data, model: vinDecodeResult.model };
+          }
+          if (vinDecodeResult.year && !data.year) {
+            data = { ...data, year: vinDecodeResult.year };
+          }
+        }
+      } catch (vinError) {
+        // Log but don't fail - VIN decode is optional enhancement
+        console.warn('VIN decode failed during vehicle creation:', vinError);
+      }
+    }
+
     const vehicle = VehicleModel.create(data);
+
+    // Auto-create service schedule for the new vehicle
+    try {
+      const scheduleVinInfo = vinDecodeResult || {
+        vin: data.vin || '',
+        make: vehicle.make,
+        model: vehicle.model,
+        year: vehicle.year,
+        engineModel: null,
+        fuelType: null,
+        driveType: null,
+        vehicleType: null,
+        bodyClass: null,
+        rawResults: [],
+        success: true,
+      };
+
+      VehicleIntelligence.createServiceScheduleForVehicle(
+        vehicle.id,
+        scheduleVinInfo,
+        undefined, // lastServiceDate
+        vehicle.mileage || undefined
+      );
+    } catch (scheduleError) {
+      // Log but don't fail - schedule creation is optional
+      console.warn('Service schedule creation failed:', scheduleError);
+    }
+
     res.status(201).json(vehicle);
   } catch (error) {
     console.error('Create vehicle error:', error);

@@ -40,9 +40,9 @@ export function ServiceRecommendationList({ services, vehicle }: Props) {
           </div>
         )}
 
-        {/* Image */}
+        {/* Image - Using our DALL-E generated images */}
         <img
-          src={`https://image.pollinations.ai/prompt/${encodeURIComponent(`${vehicle.year} ${vehicle.make} ${vehicle.model} car, artistic oil painting style, vintage aesthetic, dramatic lighting, rich colors, museum quality artwork, detailed, professional, showroom`)}?width=1200&height=600&nologo=true`}
+          src={`/api/vehicle-images/proxy/${encodeURIComponent(vehicle.make)}/${encodeURIComponent(vehicle.model)}/${vehicle.year}`}
           alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
           className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setImageLoaded(true)}
@@ -83,7 +83,7 @@ export function ServiceRecommendationList({ services, vehicle }: Props) {
       {/* Services List */}
       <div className="p-6 sm:p-8">
         <div className="space-y-3">
-          {services.map((service, index) => (
+          {services.map((service) => (
             <div
               key={service.id}
               className="group flex items-start space-x-4 p-4 rounded-xl border-2 border-gray-100 hover:border-blue-200 hover:bg-blue-50/50 transition-all duration-200"

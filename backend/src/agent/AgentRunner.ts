@@ -4,7 +4,7 @@ import * as AgentRunModel from '../models/AgentRun.js';
 import * as VehicleModel from '../models/Vehicle.js';
 import * as CustomerModel from '../models/Customer.js';
 import * as ServiceLogModel from '../models/ServiceLog.js';
-import { getExpectedServicesForVehicle } from '../services/expectedServicesService.js';
+import { getExpectedServicesByVehicle } from '../services/expectedServicesService.js';
 import { CreateInsightRequest, InsightType, InsightPriority, InsightActionType } from '../models/types.js';
 
 // Tool definitions for Claude
@@ -117,7 +117,7 @@ async function executeTool(name: string, input: Record<string, any>): Promise<st
   try {
     switch (name) {
       case 'get_all_vehicles': {
-        const vehicles = VehicleModel.findAll(100, 0);
+        const vehicles = VehicleModel.findAll(undefined, 100, 0);
         const vehiclesWithCustomers = vehicles.map(v => {
           const customer = CustomerModel.findById(v.customer_id);
           return { ...v, customer };
@@ -131,7 +131,8 @@ async function executeTool(name: string, input: Record<string, any>): Promise<st
       }
 
       case 'get_expected_services': {
-        const services = getExpectedServicesForVehicle(input.vehicle_id);
+        const allServices = getExpectedServicesByVehicle();
+        const services = allServices[input.vehicle_id] || [];
         return JSON.stringify(services, null, 2);
       }
 

@@ -27,4 +27,9 @@ export const config = {
     milesBeforeDue: 300,
     suppressionDays: 7,
   },
+
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY || '',
+    model: process.env.OPENAI_MODEL || 'gpt-4-turbo-preview',
+  },
 };

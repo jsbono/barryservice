@@ -26,7 +26,7 @@ export function ServiceLogsTable({ serviceLogs }: Props) {
                 Date
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Mileage
+                Labor Hours
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Next Due Date
@@ -51,8 +51,8 @@ export function ServiceLogsTable({ serviceLogs }: Props) {
                   {new Date(log.service_date).toLocaleDateString()}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-gray-500">
-                  {log.mileage_at_service
-                    ? `${log.mileage_at_service.toLocaleString()} mi`
+                  {log.labor_hours
+                    ? `${log.labor_hours} hr${log.labor_hours !== 1 ? 's' : ''}`
                     : '-'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">

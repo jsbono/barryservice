@@ -1,0 +1,65 @@
+{
+  "name": "@motorai/database",
+  "version": "1.0.0",
+  "description": "Database schema and Supabase client for MotorAI",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./types": {
+      "import": "./dist/types.mjs",
+      "require": "./dist/types.js",
+      "types": "./dist/types.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "schema.sql"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts src/types.ts --format cjs,esm --dts --clean",
+    "dev": "tsup src/index.ts src/types.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src --ext .ts",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "db:migrate": "supabase db push",
+    "db:reset": "supabase db reset",
+    "db:generate-types": "supabase gen types typescript --local > src/generated-types.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "eslint": "^8.55.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.2"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "motorai",
+    "database",
+    "supabase",
+    "automotive",
+    "service"
+  ],
+  "author": "MotorAI",
+  "license": "UNLICENSED",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/motorai/barryservice.git",
+    "directory": "packages/database"
+  }
+}

@@ -14,17 +14,19 @@ export function startAgentScheduler() {
   console.log('  - ServiceDueAgent: Daily at 6:00 AM');
 }
 
-async function runServiceDueAgentSafe() {
+async function runServiceDueAgentSafe(): Promise<{ insightsCreated?: number; tokensUsed?: number } | undefined> {
   if (isRunning) {
     console.log('[AgentScheduler] Agent already running, skipping...');
-    return;
+    return undefined;
   }
 
   isRunning = true;
   try {
-    await runServiceDueAgent();
+    const result = await runServiceDueAgent();
+    return result;
   } catch (error) {
     console.error('[AgentScheduler] Error running ServiceDueAgent:', error);
+    return undefined;
   } finally {
     isRunning = false;
   }
@@ -44,7 +46,10 @@ export async function triggerAgent(agentType: string): Promise<{
   switch (agentType) {
     case 'service_due':
       const result = await runServiceDueAgentSafe();
-      return { success: true, ...result };
+      if (result) {
+        return { success: true, insightsCreated: result.insightsCreated, tokensUsed: result.tokensUsed };
+      }
+      return { success: true };
 
     default:
       return { success: false, error: `Unknown agent type: ${agentType}` };

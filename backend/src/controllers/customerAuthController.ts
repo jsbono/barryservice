@@ -3,6 +3,7 @@ import * as CustomerModel from '../models/Customer.js';
 import * as VehicleModel from '../models/Vehicle.js';
 import * as ServiceLogModel from '../models/ServiceLog.js';
 import * as ServiceRecommendationModel from '../models/ServiceRecommendation.js';
+import * as InvoiceModel from '../models/Invoice.js';
 import { verifyPassword, hashPassword } from '../utils/password.js';
 import { signToken } from '../utils/jwt.js';
 import { query, queryOne, execute } from '../config/db.js';
@@ -310,6 +311,93 @@ export async function setCustomerPassword(req: Request, res: Response): Promise<
     res.json({ success: true, message: 'Password set successfully' });
   } catch (error) {
     console.error('Set customer password error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+// Get customer's invoices
+export function getMyInvoices(req: Request, res: Response): void {
+  try {
+    if (!req.user || req.user.role !== 'customer') {
+      res.status(401).json({ error: 'Not authenticated as customer' });
+      return;
+    }
+
+    const { vehicle_id } = req.query;
+
+    // Get all invoices for this customer
+    let invoices = InvoiceModel.findByCustomerId(req.user.userId);
+
+    // Optionally filter by vehicle
+    if (vehicle_id && typeof vehicle_id === 'string') {
+      invoices = invoices.filter(inv => inv.vehicle_id === vehicle_id);
+    }
+
+    // Filter out draft invoices - customers should only see sent/paid/overdue
+    invoices = invoices.filter(inv => inv.status !== 'draft');
+
+    // Attach vehicle info to each invoice
+    const invoicesWithDetails = invoices.map(inv => {
+      const vehicle = VehicleModel.findById(inv.vehicle_id);
+      return {
+        ...inv,
+        vehicle: vehicle ? {
+          id: vehicle.id,
+          make: vehicle.make,
+          model: vehicle.model,
+          year: vehicle.year,
+        } : null,
+      };
+    });
+
+    res.json({ invoices: invoicesWithDetails });
+  } catch (error) {
+    console.error('Get customer invoices error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+// Get invoice PDF for customer
+export function getInvoicePdf(req: Request, res: Response): void {
+  try {
+    if (!req.user || req.user.role !== 'customer') {
+      res.status(401).json({ error: 'Not authenticated as customer' });
+      return;
+    }
+
+    const { invoiceId } = req.params;
+    const invoice = InvoiceModel.findById(invoiceId);
+
+    if (!invoice) {
+      res.status(404).json({ error: 'Invoice not found' });
+      return;
+    }
+
+    // Verify ownership - invoice must belong to this customer
+    if (invoice.customer_id !== req.user.userId) {
+      res.status(403).json({ error: 'Access denied' });
+      return;
+    }
+
+    // Don't allow access to draft invoices
+    if (invoice.status === 'draft') {
+      res.status(403).json({ error: 'Invoice not available' });
+      return;
+    }
+
+    // Check if PDF exists
+    if (!invoice.pdf_data) {
+      res.status(404).json({ error: 'PDF not available' });
+      return;
+    }
+
+    // Send PDF
+    const pdfBuffer = Buffer.from(invoice.pdf_data, 'base64');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${invoice.invoice_number}.pdf"`);
+    res.send(pdfBuffer);
+  } catch (error) {
+    console.error('Get invoice PDF error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 }

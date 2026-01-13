@@ -172,6 +172,17 @@ export function ExpectedServicesTable() {
                 <div className="text-xs text-gray-500 mt-1">
                   {service.current_mileage?.toLocaleString() || '?'} / {service.next_due_mileage.toLocaleString()} mi
                 </div>
+                <div className="mt-3">
+                  <Link
+                    to={`/dashboard/voice?vehicle_id=${service.vehicle_id}`}
+                    className="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors w-full justify-center"
+                  >
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Log Service
+                  </Link>
+                </div>
               </div>
             ))}
           </div>
@@ -201,6 +212,9 @@ export function ExpectedServicesTable() {
                   </th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                     Miles Until Due
+                  </th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                    Action
                   </th>
                 </tr>
               </thead>
@@ -261,6 +275,17 @@ export function ExpectedServicesTable() {
                       ) : (
                         <span className="text-sm text-gray-400">Unknown</span>
                       )}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-right">
+                      <Link
+                        to={`/dashboard/voice?vehicle_id=${service.vehicle_id}`}
+                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors"
+                      >
+                        <svg className="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Log Service
+                      </Link>
                     </td>
                   </tr>
                 ))}
