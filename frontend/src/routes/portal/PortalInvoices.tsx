@@ -3,6 +3,8 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useCustomerAuth } from '../../lib/customerAuth';
 import { Invoice } from '../../lib/types';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 export function PortalInvoices() {
   const { customer, logout } = useCustomerAuth();
   const navigate = useNavigate();
@@ -22,7 +24,7 @@ export function PortalInvoices() {
   const fetchInvoices = async () => {
     try {
       const token = localStorage.getItem('customer_token');
-      const response = await fetch('/api/portal/invoices', {
+      const response = await fetch(`${API_BASE}/portal/invoices`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -46,7 +48,7 @@ export function PortalInvoices() {
     try {
       setDownloading(invoice.id);
       const token = localStorage.getItem('customer_token');
-      const response = await fetch(`/api/portal/invoices/${invoice.id}/pdf`, {
+      const response = await fetch(`${API_BASE}/portal/invoices/${invoice.id}/pdf`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },

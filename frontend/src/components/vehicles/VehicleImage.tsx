@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 interface VehicleImageProps {
   make: string;
   model: string;
@@ -21,8 +23,8 @@ export function VehicleImage({ make, model, year, vehicleId, className = '', siz
 
   // Use proxy endpoint - serves image directly, bypasses CORS
   const imageUrl = vehicleId
-    ? `/api/vehicle-images/proxy/vehicle/${vehicleId}`
-    : `/api/vehicle-images/proxy/${encodeURIComponent(make)}/${encodeURIComponent(model)}/${year}`;
+    ? `${API_BASE}/vehicle-images/proxy/vehicle/${vehicleId}`
+    : `${API_BASE}/vehicle-images/proxy/${encodeURIComponent(make)}/${encodeURIComponent(model)}/${year}`;
 
   // Fallback SVG car icon
   const FallbackIcon = () => (

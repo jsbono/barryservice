@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { ServiceRecommendation } from '../../lib/types';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 interface Props {
   services: ServiceRecommendation[];
   vehicle: { make: string; model: string; year: number };
@@ -42,7 +44,7 @@ export function ServiceRecommendationList({ services, vehicle }: Props) {
 
         {/* Image - Using our DALL-E generated images */}
         <img
-          src={`/api/vehicle-images/proxy/${encodeURIComponent(vehicle.make)}/${encodeURIComponent(vehicle.model)}/${vehicle.year}`}
+          src={`${API_BASE}/vehicle-images/proxy/${encodeURIComponent(vehicle.make)}/${encodeURIComponent(vehicle.model)}/${vehicle.year}`}
           alt={`${vehicle.year} ${vehicle.make} ${vehicle.model}`}
           className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           onLoad={() => setImageLoaded(true)}

@@ -114,10 +114,48 @@ export function PublicHome() {
   // Service modal state
   const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
 
+  // Fallback makes data if API returns empty
+  const fallbackMakes = [
+    'Acura', 'Audi', 'BMW', 'Chevrolet', 'Ford', 'GMC', 'Honda', 'Hyundai',
+    'Jeep', 'Kia', 'Lexus', 'Mazda', 'Mercedes-Benz', 'Nissan', 'RAM',
+    'Subaru', 'Tesla', 'Toyota', 'Volkswagen'
+  ];
+
   // Load makes on mount
   useEffect(() => {
-    getMakes().then(res => setMakes(res.makes)).catch(console.error);
+    getMakes()
+      .then(res => {
+        // Use API data if available, otherwise use fallback
+        setMakes(res.makes && res.makes.length > 0 ? res.makes : fallbackMakes);
+      })
+      .catch(() => {
+        // On error, use fallback makes
+        setMakes(fallbackMakes);
+      });
   }, []);
+
+  // Fallback models by make
+  const fallbackModels: Record<string, string[]> = {
+    'Acura': ['MDX', 'RDX', 'TLX', 'ILX'],
+    'Audi': ['A4', 'A6', 'Q5', 'Q7'],
+    'BMW': ['3 Series', '5 Series', 'X3', 'X5'],
+    'Chevrolet': ['Silverado', 'Equinox', 'Malibu', 'Tahoe'],
+    'Ford': ['F-150', 'Escape', 'Explorer', 'Mustang'],
+    'GMC': ['Sierra', 'Yukon', 'Terrain', 'Acadia'],
+    'Honda': ['Accord', 'Civic', 'CR-V', 'Pilot'],
+    'Hyundai': ['Elantra', 'Sonata', 'Tucson', 'Santa Fe'],
+    'Jeep': ['Wrangler', 'Grand Cherokee', 'Cherokee', 'Compass'],
+    'Kia': ['K5', 'Sportage', 'Telluride', 'Sorento'],
+    'Lexus': ['ES', 'RX', 'NX', 'GX'],
+    'Mazda': ['Mazda3', 'Mazda6', 'CX-5', 'CX-9'],
+    'Mercedes-Benz': ['C-Class', 'E-Class', 'GLE', 'GLC'],
+    'Nissan': ['Altima', 'Sentra', 'Rogue', 'Pathfinder'],
+    'RAM': ['1500', '2500', '3500'],
+    'Subaru': ['Outback', 'Forester', 'Crosstrek', 'Impreza'],
+    'Tesla': ['Model 3', 'Model Y', 'Model S', 'Model X'],
+    'Toyota': ['Camry', 'Corolla', 'RAV4', 'Highlander', 'Tacoma', 'Tundra'],
+    'Volkswagen': ['Jetta', 'Passat', 'Tiguan', 'Atlas'],
+  };
 
   // Load models when make changes
   useEffect(() => {
@@ -126,16 +164,41 @@ export function PublicHome() {
       setYears([]);
       setSelectedModel('');
       setSelectedYear('');
-      getModels(selectedMake).then(res => setModels(res.models)).catch(console.error);
+      getModels(selectedMake)
+        .then(res => {
+          // Use API data if available, otherwise use fallback
+          const apiModels = res.models && res.models.length > 0 ? res.models : (fallbackModels[selectedMake] || []);
+          setModels(apiModels);
+        })
+        .catch(() => {
+          setModels(fallbackModels[selectedMake] || []);
+        });
     }
   }, [selectedMake]);
+
+  // Generate fallback years (current year + 1 down to 1990)
+  const generateFallbackYears = () => {
+    const currentYear = new Date().getFullYear();
+    const years: number[] = [];
+    for (let year = currentYear + 1; year >= 1990; year--) {
+      years.push(year);
+    }
+    return years;
+  };
 
   // Load years when model changes
   useEffect(() => {
     if (selectedMake && selectedModel) {
       setYears([]);
       setSelectedYear('');
-      getYears(selectedMake, selectedModel).then(res => setYears(res.years)).catch(console.error);
+      getYears(selectedMake, selectedModel)
+        .then(res => {
+          // Use API data if available, otherwise use fallback
+          setYears(res.years && res.years.length > 0 ? res.years : generateFallbackYears());
+        })
+        .catch(() => {
+          setYears(generateFallbackYears());
+        });
     }
   }, [selectedMake, selectedModel]);
 
@@ -169,26 +232,27 @@ export function PublicHome() {
           HERO SECTION
           ══════════════════════════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left Column - Content */}
-            <div className="order-2 lg:order-1">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-16 lg:py-24">
+          {/* Mobile: Stack with tagline first, then image */}
+          <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 lg:gap-16 items-center">
+            {/* Content - Always first on mobile */}
+            <div className="order-1 lg:order-1">
+              <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
                 Fast, honest repairs.
                 <br />
                 <span className="text-amber-500">Accurate invoices.</span>
                 <br />
                 Zero confusion.
               </h1>
-              <p className="mt-6 text-xl text-gray-700 leading-relaxed max-w-xl">
+              <p className="mt-4 sm:mt-6 text-lg sm:text-xl text-gray-700 leading-relaxed max-w-xl">
                 See what your car needs next, track every service, and get clear estimates from a real mechanic.
               </p>
 
               {/* CTAs */}
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-6 sm:mt-8 flex flex-wrap gap-3 sm:gap-4">
                 <a
                   href="#assessment"
-                  className="inline-flex items-center px-8 py-4 text-lg font-semibold text-gray-900 rounded-xl transition-all hover:-translate-y-0.5"
+                  className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-gray-900 rounded-xl transition-all hover:-translate-y-0.5"
                   style={{
                     background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
                     boxShadow: '0 8px 24px -4px rgba(245, 158, 11, 0.4)',
@@ -201,14 +265,14 @@ export function PublicHome() {
                 </a>
                 <a
                   href="#services"
-                  className="inline-flex items-center px-8 py-4 text-lg font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all"
+                  className="inline-flex items-center px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold text-gray-700 bg-white border-2 border-gray-200 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all"
                 >
                   View Services
                 </a>
               </div>
 
-              {/* Trust Badges */}
-              <div className="mt-10 flex flex-wrap gap-6">
+              {/* Trust Badges - Hidden on mobile, shown on larger screens */}
+              <div className="hidden sm:flex mt-10 flex-wrap gap-6">
                 {[
                   { icon: 'badge', text: 'ASE Certified' },
                   { icon: 'dollar', text: 'Upfront Pricing' },
@@ -227,16 +291,16 @@ export function PublicHome() {
               </div>
             </div>
 
-            {/* Right Column - Image */}
-            <div className="order-1 lg:order-2 relative">
+            {/* Image - Second on mobile, smaller height */}
+            <div className="order-2 lg:order-2 relative w-full">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl">
                 <img
                   src="https://images.unsplash.com/photo-1619642751034-765dfdf7c58e?w=800&q=80"
                   alt="Mechanic working on car engine"
-                  className="w-full h-[400px] lg:h-[500px] object-cover"
+                  className="w-full h-[200px] sm:h-[400px] lg:h-[500px] object-cover"
                 />
-                {/* Overlay Card */}
-                <div className="absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur rounded-xl p-4 shadow-lg">
+                {/* Overlay Card - Hidden on mobile */}
+                <div className="hidden sm:block absolute bottom-4 left-4 right-4 bg-white/95 backdrop-blur rounded-xl p-4 shadow-lg">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
                       <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,6 +319,23 @@ export function PublicHome() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Mobile Trust Badges - Horizontal scroll */}
+          <div className="flex sm:hidden mt-6 gap-4 overflow-x-auto pb-2 -mx-4 px-4">
+            {[
+              { text: 'ASE Certified' },
+              { text: 'Upfront Pricing' },
+              { text: 'Digital Records' },
+              { text: 'Text Updates' },
+            ].map((badge, i) => (
+              <div key={i} className="flex items-center gap-2 text-xs text-gray-700 whitespace-nowrap bg-amber-50 px-3 py-2 rounded-full">
+                <svg className="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                {badge.text}
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -282,10 +363,11 @@ export function PublicHome() {
                   value={selectedYear}
                   onChange={(e) => setSelectedYear(Number(e.target.value))}
                   disabled={!selectedModel}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors disabled:bg-gray-50 disabled:text-gray-400"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors disabled:bg-gray-50 disabled:text-gray-400 text-gray-900 bg-white appearance-none"
+                  style={{ WebkitAppearance: 'menulist', color: selectedYear ? '#111827' : '#9CA3AF' }}
                 >
-                  <option value="">{selectedModel ? 'Select Year' : 'Select model first'}</option>
-                  {years.map(y => <option key={y} value={y}>{y}</option>)}
+                  <option value="" className="text-gray-400">{selectedModel ? 'Select Year' : 'Select model first'}</option>
+                  {years.map(y => <option key={y} value={y} className="text-gray-900">{y}</option>)}
                 </select>
               </div>
               <div>
@@ -293,10 +375,11 @@ export function PublicHome() {
                 <select
                   value={selectedMake}
                   onChange={(e) => setSelectedMake(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors text-gray-900 bg-white appearance-none"
+                  style={{ WebkitAppearance: 'menulist', color: selectedMake ? '#111827' : '#9CA3AF' }}
                 >
-                  <option value="">Select Make</option>
-                  {makes.map(m => <option key={m} value={m}>{m}</option>)}
+                  <option value="" className="text-gray-400">Select Make</option>
+                  {makes.map(m => <option key={m} value={m} className="text-gray-900">{m}</option>)}
                 </select>
               </div>
               <div>
@@ -305,10 +388,11 @@ export function PublicHome() {
                   value={selectedModel}
                   onChange={(e) => setSelectedModel(e.target.value)}
                   disabled={!selectedMake}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors disabled:bg-gray-50 disabled:text-gray-400"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors disabled:bg-gray-50 disabled:text-gray-400 text-gray-900 bg-white appearance-none"
+                  style={{ WebkitAppearance: 'menulist', color: selectedModel ? '#111827' : '#9CA3AF' }}
                 >
-                  <option value="">{selectedMake ? 'Select Model' : 'Select make first'}</option>
-                  {models.map(m => <option key={m} value={m}>{m}</option>)}
+                  <option value="" className="text-gray-400">{selectedMake ? 'Select Model' : 'Select make first'}</option>
+                  {models.map(m => <option key={m} value={m} className="text-gray-900">{m}</option>)}
                 </select>
               </div>
               <div>
@@ -318,7 +402,7 @@ export function PublicHome() {
                   value={mileage}
                   onChange={(e) => setMileage(e.target.value)}
                   placeholder="e.g. 45000"
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-amber-500 focus:ring-0 transition-colors text-gray-900 bg-white"
                 />
               </div>
             </div>

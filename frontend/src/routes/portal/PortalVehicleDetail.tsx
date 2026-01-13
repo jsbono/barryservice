@@ -8,6 +8,8 @@ import {
   PortalScheduledService,
 } from '../../lib/types';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 type TabType = 'services' | 'recommended' | 'scheduled';
 
 export function PortalVehicleDetail() {
@@ -53,10 +55,10 @@ export function PortalVehicleDetail() {
     setLoading(true);
     try {
       const [vehicleData, servicesData, recommendedData, scheduledData] = await Promise.all([
-        fetchWithAuth(`/api/portal/vehicle/${vehicleId}`),
-        fetchWithAuth(`/api/portal/vehicle/${vehicleId}/services`),
-        fetchWithAuth(`/api/portal/vehicle/${vehicleId}/recommended`),
-        fetchWithAuth(`/api/portal/vehicle/${vehicleId}/scheduled`),
+        fetchWithAuth(`${API_BASE}/portal/vehicle/${vehicleId}`),
+        fetchWithAuth(`${API_BASE}/portal/vehicle/${vehicleId}/services`),
+        fetchWithAuth(`${API_BASE}/portal/vehicle/${vehicleId}/recommended`),
+        fetchWithAuth(`${API_BASE}/portal/vehicle/${vehicleId}/scheduled`),
       ]);
 
       setVehicle(vehicleData.vehicle);

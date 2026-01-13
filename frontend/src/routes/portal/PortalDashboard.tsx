@@ -4,6 +4,8 @@ import { useCustomerAuth } from '../../lib/customerAuth';
 import { PortalVehicle, PortalRecommendedService } from '../../lib/types';
 import { VehicleImage } from '../../components/vehicles/VehicleImage';
 
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
+
 // Types for vehicle status
 type VehicleStatus = 'overdue' | 'due_soon' | 'up_to_date' | 'unknown';
 
@@ -923,14 +925,14 @@ export function PortalDashboard() {
   const fetchVehiclesWithStatus = async () => {
     setLoading(true);
     try {
-      const data = await fetchWithAuth('/api/portal/me/vehicles');
+      const data = await fetchWithAuth(`${API_BASE}/portal/me/vehicles`);
       const vehiclesData: PortalVehicle[] = data.vehicles;
 
       // Fetch recommendations for each vehicle to compute status
       const vehiclesWithStatus: VehicleWithStatus[] = await Promise.all(
         vehiclesData.map(async (vehicle) => {
           try {
-            const recommendedData = await fetchWithAuth(`/api/portal/vehicle/${vehicle.id}/recommended`);
+            const recommendedData = await fetchWithAuth(`${API_BASE}/portal/vehicle/${vehicle.id}/recommended`);
             const recommended: PortalRecommendedService[] = recommendedData.recommended || [];
             const { status, statusLabel, dueCount, nextRecommendation } = computeVehicleStatus(recommended);
 
@@ -974,7 +976,7 @@ export function PortalDashboard() {
   };
 
   const handleAddVehicle = async (data: { make: string; model: string; year: number; mileage?: number }) => {
-    const response = await fetch('/api/portal/me/vehicles', {
+    const response = await fetch(`${API_BASE}/portal/me/vehicles`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -992,7 +994,7 @@ export function PortalDashboard() {
   };
 
   const handleRequestService = async (data: { vehicleId: string; serviceType: string; description: string }) => {
-    const response = await fetch('/api/portal/service-request', {
+    const response = await fetch(`${API_BASE}/portal/service-request`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
